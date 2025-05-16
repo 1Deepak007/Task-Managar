@@ -1,8 +1,9 @@
 ----------------> Backend
 cd backend_task_manager
 npm init -y
-npm install express mysql2 sequelize jsonwebtoken bcryptjs cors helmet express-validator dotenv
+npm install express mysql2 sequelize mime-types jsonwebtoken bcryptjs cors helmet express-validator dotenv
 npm install --save-dev nodemon
+npm i cloudinary
 run ====> nodemon server.js
 
 =====================================================================

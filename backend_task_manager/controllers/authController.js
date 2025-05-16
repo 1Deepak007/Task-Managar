@@ -3,19 +3,25 @@ const jwt = require('jsonwebtoken');
 const conn = require('../config/db');
 
 
+
+
 const signup = async (req, res) => {
-    const { email, password } = req.body;
-
-    if (!email) return res.status(400).json({ message: 'Email is required' });
-    if (!password) return res.status(400).json({ message: 'Password is required' });
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        return res.status(400).json({ message: 'Invalid email format' });
-    }
-
     try {
+        // Validate presence of required body data.  File is handled in separate endpoint
+        const { email, password, username, firstname, lastname } = req.body;
+        console.log('Signup attempt with data:', req.body);
+
+        if (!email) return res.status(400).json({ message: 'Email is required' });
+        if (!password) return res.status(400).json({ message: 'Password is required' });
+        if (!username) return res.status(400).json({ message: 'Username is required' });
+        if (!firstname) return res.status(400).json({ message: 'First name is required' });
+
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+
         // Check if email exists
         const [existing] = await conn.query('SELECT id FROM users WHERE email = ?', [email]);
         if (existing.length > 0) {
@@ -25,10 +31,10 @@ const signup = async (req, res) => {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Insert user
+        // Insert user (without profile picture)
         const [result] = await conn.query(
-            'INSERT INTO users (email, password) VALUES (?, ?)',
-            [email, hashedPassword]
+            'INSERT INTO users (username, firstname, lastname, email, password, profile_picture) VALUES (?, ?, ?, ?, ?, ?)',
+            [username, firstname, lastname || null, email, hashedPassword, null] // profile_picture is initially null
         );
 
         // Create token
@@ -46,15 +52,18 @@ const signup = async (req, res) => {
             maxAge: 3600000 // 1 hour
         });
 
-        return res.status(201).json({ 
-            message: 'User created successfully',
+        return res.status(201).json({
+            message: 'User created successfully.  Profile picture can be uploaded later.',
             user: { id: result.insertId, email }
         });
+
     } catch (error) {
         console.error('Signup error:', error);
         return res.status(500).json({ message: 'Internal server error' });
     }
 };
+
+
 
 /**
  * Handles user login.
@@ -64,7 +73,7 @@ const signup = async (req, res) => {
  */
 const login = async (req, res) => {
     const { email, password } = req.body;
-    console.log('Login attempt for:', email); // Better logging
+    // console.log('Login attempt for:', email); 
 
     // Input validation
     if (!email || !password) {
@@ -89,7 +98,7 @@ const login = async (req, res) => {
     try {
         // Retrieve user from database
         const [users] = await conn.query(
-            'SELECT id, email, password FROM users WHERE email = ?', 
+            'SELECT * FROM users WHERE email = ?', 
             [email]
         );
 
@@ -160,8 +169,9 @@ const logout = (req, res) => {
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
+
 module.exports = {
     signup,
     login,
-    logout,
+    logout
 };
