@@ -7,6 +7,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const taskRoutes = require('./routes/tasksRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const authenticateUser = require('./middlewares/authMiddleware');
 
 
 const app = express();
@@ -15,11 +16,13 @@ const PORT = process.env.PORT || 3289;
 
 app.use(helmet());
 app.use(express.json());
-app.use(cookieParser());
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true
 }));
+
+// cookieParser should be applied before any middleware that uses req.cookies
+app.use(cookieParser());
 
 // Connect to the database
 if(conn){
@@ -35,8 +38,8 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/tasks', taskRoutes);
-app.use('/api/profile', profileRoutes);
+app.use('/api/tasks', authenticateUser, taskRoutes);
+app.use('/api/profile', authenticateUser, profileRoutes);
 
 
 app.listen(PORT, () => {

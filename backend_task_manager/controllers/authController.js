@@ -170,8 +170,29 @@ const logout = (req, res) => {
 };
 
 
+const authCheck = async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ isAuthenticated: false });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+        return res.status(401).json({ isAuthenticated: false });
+      }
+      // Token is valid
+      return res.status(200).json({ isAuthenticated: true, user: { id: user.id, email: user.email } });
+    });
+  } catch (error) {
+    console.error('Auth check error:', error);
+    return res.status(500).json({ isAuthenticated: false });
+  }
+};
+
 module.exports = {
     signup,
     login,
-    logout
+    logout,
+    authCheck
 };

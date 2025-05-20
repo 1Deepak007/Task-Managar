@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
+
 const Signup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate  = useNavigate();
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('Username is required'),
@@ -50,6 +53,7 @@ const Signup = () => {
         alert(response.data.message || 'Account created successfully!');
         console.log('Signup successful:', response.data);
         resetForm();
+        navigate('/login');
       } catch (error) {
         console.error('Signup error:', error);
 
@@ -69,7 +73,7 @@ const Signup = () => {
 
 
   return (
-    <div className='flex flex-col items-center justify-center h-screen bg-gray-800'>
+    <div className='flex flex-col items-center justify-center h-screen bg-gray-900'>
       <div className='bg-white shadow-md rounded-lg p-6 w-90'>
         <h1 className='text-center underline text-2xl font-bold font-sans mb-5'>Signup</h1>
         <form className='flex flex-col items-center justify-center mt-4' onSubmit={formik.handleSubmit}>
@@ -149,16 +153,23 @@ const Signup = () => {
           )}
 
           <button
-            className='bg-blue-500 text-white rounded-md p-2 w-80 hover:bg-blue-600 transition duration-200 mt-4'
+            className={`relative w-80 rounded-md mt-4 focus:outline-none focus:shadow-outline ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             type="submit"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Creating Account...' : 'Signup'}
+            <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-md" />
+            <div className="px-8 py-2 bg-black rounded-[6px] relative group transition duration-200 text-white hover:bg-transparent w-full text-center">
+              {isSubmitting ? 'Creating Account...' : 'Signup'}
+            </div>
           </button>
           {formik.errors.general && (
             <p className="text-red-500 text-sm italic mt-2">{formik.errors.general}</p>
           )}
         </form>
+      </div>
+      <div className='mt-4'>
+        <p className='text-white'>Already have an account? <Link to="/" className='text-blue-500 hover:underline'>Login</Link></p>
       </div>
     </div>
   );
