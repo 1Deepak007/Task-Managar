@@ -12,7 +12,6 @@ const Dashboard = () => {
 
   return (
     <>
-      <Navbar />
       <Tasks />
     </>
   );

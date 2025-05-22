@@ -5,7 +5,9 @@ import { Toaster } from 'react-hot-toast';
 import Signup from './components/Signup';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import Profile from './components/Profile';
 import { useAuth } from './components/contextapi/AuthContext'; 
+import Navbar from './components/utils/Navbar';
 
 function App() {
   const { isAuthenticated, user, authCheckCompleted, handleAuthChange } = useAuth();
@@ -21,6 +23,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+    <Navbar />
         <Toaster
           position="top-right"
           toastOptions={{
@@ -47,6 +50,10 @@ function App() {
             path="/login"
             element={isAuthenticated ? <Navigate to="/home" replace /> : <Login onAuthChange={handleAuthChange} />}
           />
+          <Route 
+            path="/profile"
+            element={isAuthenticated ? <Profile /> : <Navigate to="/login" replace />}
+            />
         </Routes>
       </BrowserRouter>
     </>

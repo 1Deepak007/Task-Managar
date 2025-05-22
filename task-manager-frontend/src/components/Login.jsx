@@ -35,7 +35,7 @@ const Login = ({ onAuthChange }) => {
 
   return (
     <div className="flex flex-col justify-center items-center h-screen bg-gray-900 text-white">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg text-black w-1/3">
+      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg text-black w-1/5 md:w-1/3 lg:w-1/5">
         <h2 className="text-2xl font-bold mb-4">Login</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="mb-4">

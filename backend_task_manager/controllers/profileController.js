@@ -9,7 +9,7 @@ require('dotenv').config();
 const getUserProfile = async (req, res) => {
     try {
         const userId = req.user.id;
-        const [user] = await conn.query(`SELECT id, username, firstname, lastname, email, profile_picture FROM users WHERE id = ${userId}`);
+        const [user] = await conn.query(`SELECT id, username, firstname, lastname, email, profile_picture, created_at FROM users WHERE id = ${userId}`);
         if (user.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
