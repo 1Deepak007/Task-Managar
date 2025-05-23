@@ -23,7 +23,10 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Navbar />
+      {
+        isAuthenticated ?
+        <Navbar /> : null
+      }
         <Toaster
           position="top-right"
           toastOptions={{
