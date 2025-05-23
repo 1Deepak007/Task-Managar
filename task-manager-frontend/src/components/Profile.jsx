@@ -273,17 +273,19 @@ const Profile = () => {
         passwordFormik.resetForm();
     };
 
-    const handleDeleteAccount=()=>{
-        axios.delete('http://localhost:3289/api/profile/deleteProfile')
-        .then(response => {
-            toast.success('Account deleted successfully!');
-            navigate('/login');
-            console.log(response.data);
-        })
-        .catch(error => {
-            console.error('Error deleting account:', error);
-            toast.error('Failed to delete account. Please try again.');
-        });
+    const handleDeleteAccount = () => {
+        if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            axios.delete('http://localhost:3289/api/profile/deleteProfile')
+                .then(response => {
+                    toast.success('Account deleted successfully!');
+                    navigate('/login');
+                    console.log(response.data);
+                })
+                .catch(error => {
+                    console.error('Error deleting account:', error);
+                    toast.error('Failed to delete account. Please try again.');
+                });
+        }
     }
 
     return (
@@ -365,7 +367,7 @@ const Profile = () => {
                     </div>
                     <div className="flex-row mt-2">
                         <button
-                            className="bg-yellow-500 hover:bg-red-400 text-white text-sm font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
+                            className="bg-green-500 hover:bg-red-400 text-white text-sm font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
                             type="button"
                             onClick={triggerFileInput}
                         >

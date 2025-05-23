@@ -1,10 +1,10 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
 import axios from 'axios';
 import { CgProfile } from "react-icons/cg";
 
 const Navbar = () => {
-    const navigate = useNavigate();
+    const location = useLocation(); // Initialize useLocation to get the current path
     const [isLoggingOut, setIsLoggingOut] = React.useState(false);
 
     const handleLogout = async () => {
@@ -40,7 +40,10 @@ const Navbar = () => {
                         <div className="flex items-center space-x-4">
                             <Link
                                 to="/home"
-                                className="text-gray-300 hover:text-blue-400 hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
+                                className={`
+                                    hover:text-green-300 hover:bg-gray-800 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200
+                                    ${location.pathname === '/home' ? 'text-green-300' : 'text-gray-300'}
+                                `}
                             >
                                 Tasks
                             </Link>
@@ -49,7 +52,13 @@ const Navbar = () => {
 
                     {/* Right Section: Profile Icon and Logout */}
                     <div className="flex items-center space-x-4">
-                        <Link to="/profile" className="text-gray-300 hover:text-white">
+                        <Link
+                            to="/profile"
+                            className={`
+                                flex items-center text-gray-300 hover:text-white
+                                ${location.pathname === '/profile' ? 'text-green-300' : 'text-gray-300'}
+                            `}
+                        >
                             <CgProfile className="h-6 w-6 hover:size-7 hover:text-green-400" />
                         </Link>
                         <button

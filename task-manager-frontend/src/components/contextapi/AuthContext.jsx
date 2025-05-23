@@ -56,7 +56,6 @@ export const AuthProvider = ({ children }) => {
           isHandling401 = true;
           setIsAuthenticated(false);
           setUser(null);
-          // window.location.href = '/login'; // Redirect to login
           isHandling401 = false;
         }
         return Promise.reject(error);
