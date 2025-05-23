@@ -19,6 +19,8 @@ const Profile = () => {
 
     const [changePassModal, setChangePassModal] = useState(false); // Renamed for clarity: changePassModel -> changePassModal
 
+    const [changeProfilePic, setChangeProfilePic] = useState(null);
+
     const validationSchema = Yup.object({
         firstname: Yup.string()
             .min(2, 'First name must be at least 2 characters')
@@ -150,6 +152,7 @@ const Profile = () => {
         }
     };
 
+
     useEffect(() => {
         getProfile();
     }, []);
@@ -270,6 +273,19 @@ const Profile = () => {
         passwordFormik.resetForm();
     };
 
+    const handleDeleteAccount=()=>{
+        axios.delete('http://localhost:3289/api/profile/deleteProfile')
+        .then(response => {
+            toast.success('Account deleted successfully!');
+            navigate('/login');
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.error('Error deleting account:', error);
+            toast.error('Failed to delete account. Please try again.');
+        });
+    }
+
     return (
         <div className="max-w-4xl w-full mx-auto bg-white shadow-2xl rounded-2xl p-8 sm:p-10 lg:p-12 transform transition-all duration-300 ">
             <ToastContainer
@@ -344,13 +360,23 @@ const Profile = () => {
                             type="button"
                             onClick={openChangePassModal}
                         >
-                            Change Password
+                            Update Password
                         </button>
                     </div>
                     <div className="flex-row mt-2">
                         <button
-                            className="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-3 px-7 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
+                            className="bg-yellow-500 hover:bg-red-400 text-white text-sm font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
                             type="button"
+                            onClick={triggerFileInput}
+                        >
+                            Update Pro. Pic.
+                        </button>
+                    </div>
+                    <div className="flex-row mt-2">
+                        <button
+                            className="bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-3 px-6.5 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-75"
+                            type="button"
+                            onClick={handleDeleteAccount}
                         >
                             Delete Account
                         </button>

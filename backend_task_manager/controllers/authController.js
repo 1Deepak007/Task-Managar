@@ -77,7 +77,7 @@ const login = async (req, res) => {
 
     // Input validation
     if (!email || !password) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: 'Both email and password are required',
             fields: {
                 email: !email ? 'Email is required' : null,
@@ -89,7 +89,7 @@ const login = async (req, res) => {
     // Improved email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             message: 'Invalid email format',
             example: 'user@example.com'
         });
@@ -98,35 +98,35 @@ const login = async (req, res) => {
     try {
         // Retrieve user from database
         const [users] = await conn.query(
-            'SELECT * FROM users WHERE email = ?', 
+            'SELECT * FROM users WHERE email = ?',
             [email]
         );
 
         if (users.length === 0) {
             console.warn('Login attempt with non-existent email:', email);
-            return res.status(401).json({ 
+            return res.status(401).json({
                 message: 'Invalid credentials' // Generic message for security
             });
         }
 
         const user = users[0];
-        
+
         // Compare passwords
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             console.warn('Failed login attempt for:', email);
-            return res.status(401).json({ 
-                message: 'Invalid credentials' 
+            return res.status(401).json({
+                message: 'Invalid credentials'
             });
         }
 
         // Create JWT token
         const token = jwt.sign(
-            { 
-                id: user.id, 
-                email: user.email 
-            }, 
-            process.env.JWT_SECRET, 
+            {
+                id: user.id,
+                email: user.email
+            },
+            process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
@@ -150,7 +150,7 @@ const login = async (req, res) => {
 
     } catch (error) {
         console.error('Login error:', error);
-        return res.status(500).json({ 
+        return res.status(500).json({
             message: 'An error occurred during login',
             error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
@@ -171,28 +171,45 @@ const logout = (req, res) => {
 
 
 const authCheck = async (req, res) => {
-  try {
-    const token = req.cookies.token;
-    if (!token) {
-      return res.status(401).json({ isAuthenticated: false });
-    }
+    try {
+        const token = req.cookies.token;
+        if (!token) {
+            return res.status(401).json({ isAuthenticated: false });
+        }
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) {
-        return res.status(401).json({ isAuthenticated: false });
-      }
-      // Token is valid
-      return res.status(200).json({ isAuthenticated: true, user: { id: user.id, email: user.email } });
-    });
-  } catch (error) {
-    console.error('Auth check error:', error);
-    return res.status(500).json({ isAuthenticated: false });
-  }
+        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+            if (err) {
+                return res.status(401).json({ isAuthenticated: false });
+            }
+            // Token is valid
+            return res.status(200).json({ isAuthenticated: true, user: { id: user.id, email: user.email } });
+        });
+    } catch (error) {
+        console.error('Auth check error:', error);
+        return res.status(500).json({ isAuthenticated: false });
+    }
 };
+
+const deleteAccount = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        await conn.query('DELETE FROM users WHERE id = ?', [userId]);
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', //  Clear in production
+            sameSite: 'Strict',
+        });
+        res.status(200).json({ message: 'Logged out & Account deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+}
 
 module.exports = {
     signup,
     login,
     logout,
-    authCheck
+    authCheck,
+    deleteAccount
 };

@@ -3,10 +3,12 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
 
 const Signup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate  = useNavigate();
+  const navigate = useNavigate();
+
 
   const validationSchema = Yup.object().shape({
     username: Yup.string().required('Username is required'),
@@ -50,7 +52,11 @@ const Signup = () => {
           }
         );
 
-        alert(response.data.message || 'Account created successfully!');
+        // alert(response.data.message || 'Account created successfully!');
+        toast.success('Signup successful!', {
+          position: 'top-center',
+          duration: 3000,
+        });
         console.log('Signup successful:', response.data);
         resetForm();
         navigate('/login');
@@ -59,10 +65,18 @@ const Signup = () => {
 
         if (error.response) {
           setFieldError('general', error.response.data.message || 'Signup failed');
-          alert(error.response.data.message || 'Signup failed');
+          // alert(error.response.data.message || 'Signup failed');
+          toast.error(error.response.data.message || 'Signup failed', {
+            position: 'top-center',
+            duration: 3000,
+          });
         } else {
           setFieldError('general', 'Network error. Please try again.');
-          alert('Network error. Please try again.');
+          // alert('Network error. Please try again.');
+          toast.error('Network error. Please try again.', {
+            position: 'top-center',
+            duration: 3000,
+          });
         }
       } finally {
         setIsSubmitting(false);
